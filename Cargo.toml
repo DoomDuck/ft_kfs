@@ -9,6 +9,7 @@ authors = [
 
 [profile.dev]
 panic = "abort"
+strip = true
 
 [profile.release]
 panic = "abort"
