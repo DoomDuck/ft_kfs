@@ -2,21 +2,29 @@
   outputs = { nixpkgs, ... } :  let 
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
+    pkgsCross = pkgs.pkgsCross.i686-embedded;
   in {
-    devShells.${system}.default = pkgs.mkShell {
+    devShells.${system}.default = pkgsCross.mkShell {
       name = "kfs";
+      nativeBuildInputs = with pkgs; [
+        # i686-elf-ld
+        buildPackages.bintools
 
-      buildInputs = with pkgs; [
         # Make iso with grub-mkrescue
         grub2
+        xorriso
+
+        # Assembly
+        nasm
 
         # Make...
         gnumake
 
-        lld
-
         # Rust tools
         rustup
+
+        # VM emulator
+        qemu
       ];
     };
   };

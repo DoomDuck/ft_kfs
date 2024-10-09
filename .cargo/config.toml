@@ -1,7 +1,6 @@
 [build]
-rustflags = [
-  "-Csoft-float"
-]
+# Default target
+target = "conf/i686-elf/i686-elf.json"
 
 [unstable]
 build-std = ["core", "compiler_builtins"]

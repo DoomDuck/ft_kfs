@@ -13,7 +13,7 @@
         "gcc": [
             "-n",
             "-T",
-            "./linker.ld",
+            "./conf/i686-elf/linker.ld",
             "-m32",
             "-nostdlib",
             "-static"
@@ -21,7 +21,7 @@
         "ld.lld": [
             "-n",
             "-T",
-            "./linker.ld",
+            "./conf/i686-elf/linker.ld",
             "-m32",
             "-nostdlib",
             "-static"
@@ -33,11 +33,8 @@
     "relocation-model": "pic",
     "code-model": "kernel",
     "disable-redzone": true,
-    "eliminate-frame-pointer": false,
     "exe-suffix": "",
     "has-rpath": false,
-    "no-compiler-rt": true,
     "no-default-libraries": true,
-    "position-independent-executables": false,
-    "has-elf-tls": true
+    "position-independent-executables": false
 }
