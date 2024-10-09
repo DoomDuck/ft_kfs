@@ -1,7 +1,16 @@
 #![no_std]
 #![no_main]
 
+mod spinlock;
+
 mod vga {
+    use crate::spinlock::SpinLock;
+
+    pub struct VgaTextMode(SpinLock<*mut TextBuffer>);
+
+    impl VgaTextMode {
+        pub fn print_char(&self, c: Char, x: usize, y: usize) {}
+    }
 
     #[repr(transparent)]
     pub struct Color(u8);
@@ -13,7 +22,7 @@ mod vga {
     }
 
     impl Color {
-        pub const BLACK : u8 = 0x0;
+        pub const BLACK: u8 = 0x0;
         pub const BLUE: u8 = 0x1;
         pub const GREEN: u8 = 0x2;
         pub const CYAN: u8 = 0x3;
@@ -37,7 +46,7 @@ mod vga {
 
     #[repr(C)]
     pub struct Char {
-        code_point: u8, 
+        code_point: u8,
         color: Color,
     }
 
@@ -50,14 +59,14 @@ mod vga {
         }
     }
 
-    #[repr(C)]
+    #[repr(transparent)]
     pub struct TextBuffer([[Char; Self::WIDTH]; Self::HEIGHT]);
 
     impl TextBuffer {
         // TODO(Dorian): add reference (see discord)
         pub const WIDTH: usize = 80;
         pub const HEIGHT: usize = 25;
-        const LOCATION: *mut TextBuffer  = 0xB8000 as *mut TextBuffer;
+        const LOCATION: *mut TextBuffer = 0xB8000 as *mut _;
 
         pub unsafe fn get() -> &'static Self {
             &mut *TextBuffer::LOCATION as _
@@ -67,7 +76,6 @@ mod vga {
             &mut *TextBuffer::LOCATION as _
         }
     }
-
 
     impl core::ops::Deref for TextBuffer {
         type Target = [[Char; Self::WIDTH]; Self::HEIGHT];
@@ -83,7 +91,6 @@ mod vga {
         }
     }
 }
-
 
 #[panic_handler]
 fn panic_handler(_info: &core::panic::PanicInfo) -> ! {
