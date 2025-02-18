@@ -23,13 +23,14 @@ fn main() {
 
     // Build static library
     Command::new("ar")
-        .arg("crus") // TODO: MAYBE remove
+        .arg("crs") // TODO: MAYBE remove
         .arg(format!("lib{STATIC_LIB_NAME}.a"))
         .arg(OBJECT_PATH)
         .spawn()
         .expect("Could not run nasm");
+
     // Search current directory for library
-    println!("cargo:rustc-link-search=native=.");
+    println!("cargo:rustc-link-search=native={}", env!("CARGO_MANIFEST_DIR"));
     // Use boot library
     println!("cargo:rustc-link-lib=static={STATIC_LIB_NAME}");
 }

@@ -1,0 +1,10 @@
+[package]
+name = "ps2"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+log = { path = "../log" }
+port = { path = "../port" }
+keyboard = { path = "../keyboard" }

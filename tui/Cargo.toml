@@ -1,0 +1,8 @@
+[package]
+name = "tui"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+vga = { path = "../vga" }

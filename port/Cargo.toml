@@ -1,0 +1,9 @@
+[package]
+name = "port"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+asm = { path = "../asm" }
+sync = { path = "../sync" }

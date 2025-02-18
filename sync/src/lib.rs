@@ -1,3 +1,5 @@
+#![no_std]
+
 use core::{
     cell::UnsafeCell,
     sync::atomic::{AtomicBool, Ordering},
@@ -7,6 +9,9 @@ pub struct SpinLock<T: ?Sized> {
     locked: AtomicBool,
     data: UnsafeCell<T>,
 }
+
+unsafe impl<T: Sync> Sync for SpinLock<T> {}
+unsafe impl<T: Send> Send for SpinLock<T> {}
 
 impl<T: ?Sized> SpinLock<T> {
     pub const fn new(data: T) -> Self
@@ -47,6 +52,20 @@ impl<'a, T: ?Sized> AsRef<T> for SpinLockGuard<'a, T> {
 impl<'a, T: ?Sized> AsMut<T> for SpinLockGuard<'a, T> {
     fn as_mut(&mut self) -> &mut T {
         unsafe { &mut *self.0.data.get() as _ }
+    }
+}
+
+impl<'a, T: ?Sized> core::ops::Deref for SpinLockGuard<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        self.as_ref()
+    }
+}
+
+impl<'a, T: ?Sized> core::ops::DerefMut for SpinLockGuard<'a, T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.as_mut()
     }
 }
 

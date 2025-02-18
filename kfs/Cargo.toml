@@ -1,0 +1,12 @@
+[package]
+name = "kfs"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+port = { path = "../port" }
+ps2 = { path = "../ps2" }
+log = { path = "../log" }
+keyboard = { path = "../keyboard" }
+collections = { path = "../collections" }
