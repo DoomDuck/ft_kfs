@@ -1,5 +1,4 @@
-[package]
-name = "kfs"
+[workspace.package]
 version = "0.1.0"
 edition = "2021"
 authors = [
@@ -7,9 +6,22 @@ authors = [
   "Dorian Burgun <dorian@burgun.dev>",
 ]
 
+[workspace]
+resolver = "2"
+
+members = [
+    "kfs",
+    "vga",
+    "ps2",
+    "port",
+    "asm",
+    "sync", "log", "keyboard", "collections", "tui",
+]
+
 [profile.dev]
 panic = "abort"
-strip = true
+# TODO(Dorian): set back on
+# strip = true
 
 [profile.release]
 panic = "abort"

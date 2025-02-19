@@ -5,7 +5,7 @@ set -o errexit    # Used to exit upon error, avoiding cascading errors
 set -o pipefail   # Unveils hidden failures
 set -o nounset    # Exposes unset variables
 
-cargo build --target ./conf/i686-elf/i686-elf.json
+cargo build --target ./conf/i686-elf/i686-elf.json --bin kfs 
 
 export ISO_DIR=isofs/boot/
 mkdir -p $ISO_DIR/grub

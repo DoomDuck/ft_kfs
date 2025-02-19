@@ -1,0 +1,112 @@
+use core::{
+    mem::MaybeUninit,
+    ops::{Deref, DerefMut},
+};
+
+pub struct ArrayVec<const CAPACITY: usize, T> {
+    len: usize,
+    values: [MaybeUninit<T>; CAPACITY],
+}
+
+impl<const CAPACITY: usize, T> ArrayVec<CAPACITY, T> {
+    pub fn new() -> Self {
+        Self {
+            len: 0,
+            values: [const { MaybeUninit::uninit() }; CAPACITY],
+        }
+    }
+
+    // Maybe return a reference to the inserted value
+    pub fn push(&mut self, value: T) -> Result<(), T> {
+        match self.len < CAPACITY {
+            false => Err(value),
+            true => unsafe {
+                self.values.get_unchecked_mut(self.len).write(value);
+                self.len += 1;
+                Ok(())
+            },
+        }
+    }
+
+    pub fn pop(&mut self) -> Option<T> {
+        match 0 < self.len {
+            false => None,
+            true => unsafe {
+                self.len -= 1;
+                Some(self.values.get_unchecked_mut(self.len).assume_init_read())
+            },
+        }
+    }
+
+    pub fn insert(&mut self, index: usize, value: T) -> Result<(), T> {
+        match self.len < CAPACITY && index <= self.len {
+            false => Err(value),
+            true => unsafe {
+                // Leave room
+                let start = &mut self.values[index] as *mut MaybeUninit<T>;
+                core::ptr::copy(start, start.add(1), self.len - index);
+
+                // Insert value
+                self.values.get_unchecked_mut(index).write(value);
+                self.len += 1;
+                Ok(())
+            },
+        }
+    }
+
+    fn iter(&self) -> impl Iterator<Item = &T> {
+        self.as_ref().iter()
+    }
+
+    fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
+        self.as_mut().iter_mut()
+    }
+}
+
+impl<const CAPACITY: usize, T> Drop for ArrayVec<CAPACITY, T> {
+    fn drop(&mut self) {
+        // Drain the structure
+        while let Some(_value) = self.pop() {}
+    }
+}
+
+impl<const CAPACITY: usize, T> AsRef<[T]> for ArrayVec<CAPACITY, T> {
+    fn as_ref(&self) -> &[T] {
+        unsafe {
+            let slice = self.values.as_slice().get_unchecked(..self.len);
+            &*(slice as *const [MaybeUninit<T>] as *const [T])
+        }
+    }
+}
+
+impl<const CAPACITY: usize, T> AsMut<[T]> for ArrayVec<CAPACITY, T> {
+    fn as_mut(&mut self) -> &mut [T] {
+        unsafe {
+            let slice = self.values.as_mut_slice().get_unchecked_mut(..self.len);
+            &mut *(slice as *mut [MaybeUninit<T>] as *mut [T])
+        }
+    }
+}
+
+impl<const CAPACITY: usize, T> Deref for ArrayVec<CAPACITY, T> {
+    type Target = [T];
+
+    fn deref(&self) -> &Self::Target {
+        self.as_ref()
+    }
+}
+
+impl<const CAPACITY: usize, T> DerefMut for ArrayVec<CAPACITY, T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.as_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ArrayVec;
+
+    fn new() {
+        let av = ArrayVec::<10, u32>::new();
+    }
+}
