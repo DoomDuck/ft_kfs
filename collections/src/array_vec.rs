@@ -51,11 +51,11 @@ impl<const CAPACITY: usize, T> ArrayVec<CAPACITY, T> {
         }
     }
 
-    fn iter(&self) -> impl Iterator<Item = &T> {
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
         self.as_ref().iter()
     }
 
-    fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
         self.as_mut().iter_mut()
     }
 }
