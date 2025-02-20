@@ -115,12 +115,3 @@ impl<const CAPACITY: usize, T: PartialEq> PartialEq for ArrayVec<CAPACITY, T> {
 }
 
 impl<const CAPACITY: usize, T: Eq> Eq for ArrayVec<CAPACITY, T> {}
-
-#[cfg(test)]
-mod tests {
-    use super::ArrayVec;
-
-    fn new() {
-        let av = ArrayVec::<10, u32>::new();
-    }
-}
