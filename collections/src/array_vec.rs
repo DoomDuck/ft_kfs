@@ -10,10 +10,7 @@ pub struct ArrayVec<const CAPACITY: usize, T> {
 
 impl<const CAPACITY: usize, T> ArrayVec<CAPACITY, T> {
     pub fn new() -> Self {
-        Self {
-            len: 0,
-            values: [const { MaybeUninit::uninit() }; CAPACITY],
-        }
+        Self::default()
     }
 
     // Maybe return a reference to the inserted value
@@ -101,6 +98,23 @@ impl<const CAPACITY: usize, T> DerefMut for ArrayVec<CAPACITY, T> {
         self.as_mut()
     }
 }
+
+impl<const CAPACITY: usize, T> Default for ArrayVec<CAPACITY, T> {
+    fn default() -> Self {
+        Self {
+            len: 0,
+            values: [const { MaybeUninit::uninit() }; CAPACITY],
+        }
+    }
+}
+
+impl<const CAPACITY: usize, T: PartialEq> PartialEq for ArrayVec<CAPACITY, T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref() == other.as_ref()
+    }
+}
+
+impl<const CAPACITY: usize, T: Eq> Eq for ArrayVec<CAPACITY, T> {}
 
 #[cfg(test)]
 mod tests {
