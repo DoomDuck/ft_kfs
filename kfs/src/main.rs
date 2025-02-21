@@ -66,12 +66,10 @@ extern "C" fn entrypoint() {
     // let keyboard = keyboard::Keyboard::ergol();
 
     let mut screen = tui::Screen::default();
-    let logger = tui::Logger;
-    let text_buffer = tui::TextBuffer::new(keyboard);
 
     let mut root_widget = tui::MultiScreen::new([
-        Entry::Text(text_buffer),
-        Entry::Log(logger),
+        Entry::Log(tui::Logger),
+        Entry::Text(tui::TextBuffer::new(keyboard)),
     ]);
 
     loop {
