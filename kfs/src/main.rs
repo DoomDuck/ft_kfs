@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use tui::Widget;
+use tui::{TextBuffer, Widget};
 
 #[panic_handler]
 fn panic_handler(info: &core::panic::PanicInfo) -> ! {
@@ -12,6 +12,29 @@ fn panic_handler(info: &core::panic::PanicInfo) -> ! {
 
     loop {
         core::hint::spin_loop();
+    }
+}
+
+enum Entry {
+    Log(tui::Logger),
+    Text(TextBuffer),
+}
+
+impl Widget for Entry {
+    type Event = keyboard::Event;
+
+    fn render(&self, screen: &mut tui::Screen, area: tui::Rectangle) {
+        match self {
+            Entry::Log(logger) => logger.render(screen, area),
+            Entry::Text(text_buffer) => text_buffer.render(screen, area),
+        }
+    }
+
+    fn update(&mut self, event: Self::Event) {
+        match self {
+            Entry::Log(logger) => logger.update(event),
+            Entry::Text(text_buffer) => text_buffer.update(event),
+        }
     }
 }
 
@@ -39,16 +62,23 @@ extern "C" fn entrypoint() {
 
     let mut decoder = ps2::keyboard::Decoder::ReadNothing;
 
-    // let mut keyboard = keyboard::Keyboard::qwerty();
-    let mut keyboard = keyboard::Keyboard::ergol();
-    
+    // let keyboard = keyboard::Keyboard::qwerty();
+    let keyboard = keyboard::Keyboard::ergol();
 
     let mut screen = tui::Screen::default();
+    let logger = tui::Logger;
+    let text_buffer = tui::TextBuffer::new(keyboard);
+
+    let mut root_widget = tui::MultiScreen::new([
+        Entry::Text(text_buffer),
+        Entry::Log(logger),
+    ]);
 
     loop {
+        screen.clear();
         let area = screen.area();
-        tui::Logger.render(&mut screen, area);
-        
+        root_widget.render(&mut screen, area);
+
         // HACK: here TextBuffer requires to be locked
         unsafe {
             screen.write_to_vga();
@@ -60,6 +90,7 @@ extern "C" fn entrypoint() {
             Err(err) => panic!("Could not decode ps2 bytes: {err:?}"),
         };
 
-        log::debug!("Got event: {event:?}")
+        log::debug!("Got event: {event:?}");
+        Widget::update(&mut root_widget, event);
     }
 }
