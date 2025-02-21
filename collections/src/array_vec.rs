@@ -10,10 +10,12 @@ pub struct ArrayVec<const CAPACITY: usize, T> {
 
 impl<const CAPACITY: usize, T> ArrayVec<CAPACITY, T> {
     pub fn new() -> Self {
-        Self {
-            len: 0,
-            values: [const { MaybeUninit::uninit() }; CAPACITY],
-        }
+        Self::default()
+    }
+
+    pub unsafe fn push_unchecked(&mut self, value: T) {
+        self.values.get_unchecked_mut(self.len).write(value);
+        self.len += 1;
     }
 
     // Maybe return a reference to the inserted value
@@ -21,8 +23,7 @@ impl<const CAPACITY: usize, T> ArrayVec<CAPACITY, T> {
         match self.len < CAPACITY {
             false => Err(value),
             true => unsafe {
-                self.values.get_unchecked_mut(self.len).write(value);
-                self.len += 1;
+                self.push_unchecked(value);
                 Ok(())
             },
         }
@@ -54,12 +55,27 @@ impl<const CAPACITY: usize, T> ArrayVec<CAPACITY, T> {
         }
     }
 
-    fn iter(&self) -> impl Iterator<Item = &T> {
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
         self.as_ref().iter()
     }
 
-    fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
         self.as_mut().iter_mut()
+    }
+
+}
+
+impl<const CAPACITY: usize, T: Clone> ArrayVec<CAPACITY, T> {
+    pub fn extend_from_slice(&mut self, slice: &[T]) -> Result<(), ()> {
+        match self.len() + slice.len() <= CAPACITY {
+            false => Err(()),
+            true => unsafe {
+                for value in slice {
+                    self.push_unchecked(value.clone());
+                }
+                Ok(())
+            },
+        }
     }
 }
 
@@ -102,11 +118,19 @@ impl<const CAPACITY: usize, T> DerefMut for ArrayVec<CAPACITY, T> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::ArrayVec;
-
-    fn new() {
-        let av = ArrayVec::<10, u32>::new();
+impl<const CAPACITY: usize, T> Default for ArrayVec<CAPACITY, T> {
+    fn default() -> Self {
+        Self {
+            len: 0,
+            values: [const { MaybeUninit::uninit() }; CAPACITY],
+        }
     }
 }
+
+impl<const CAPACITY: usize, T: PartialEq> PartialEq for ArrayVec<CAPACITY, T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref() == other.as_ref()
+    }
+}
+
+impl<const CAPACITY: usize, T: Eq> Eq for ArrayVec<CAPACITY, T> {}
