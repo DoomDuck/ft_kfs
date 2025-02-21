@@ -62,8 +62,8 @@ extern "C" fn entrypoint() {
 
     let mut decoder = ps2::keyboard::Decoder::ReadNothing;
 
-    // let keyboard = keyboard::Keyboard::qwerty();
-    let keyboard = keyboard::Keyboard::ergol();
+    let keyboard = keyboard::Keyboard::qwerty();
+    // let keyboard = keyboard::Keyboard::ergol();
 
     let mut screen = tui::Screen::default();
     let logger = tui::Logger;
