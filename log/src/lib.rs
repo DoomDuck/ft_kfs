@@ -7,7 +7,7 @@ use sync::SpinLock;
 pub use collections;
 
 // TODO: decide on variants and number order
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 #[repr(u8)]
 pub enum Level {
     Trace,
