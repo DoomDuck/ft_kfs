@@ -80,6 +80,16 @@ impl TextBuffer {
             &mut *TextBuffer::LOCATION
         }
     }
+    
+    pub fn move_cursor(x: u16, y: u16) {
+        let pos = y * Self::WIDTH as u16 + x;
+
+        // HACK: user proper ports lib
+        asm::out8(0x3D4, 0x0F);
+        asm::out8(0x3D5, pos as u8);
+        asm::out8(0x3D4, 0x0E);
+        asm::out8(0x3D5, (pos >> u8::BITS) as u8);
+    }
 }
 
 impl core::ops::Deref for TextBuffer {

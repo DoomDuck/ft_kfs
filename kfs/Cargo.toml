@@ -5,6 +5,7 @@ edition.workspace = true
 authors.workspace = true
 
 [dependencies]
+vga = { path = "../vga" }
 port = { path = "../port" }
 ps2 = { path = "../ps2" }
 log = { path = "../log" }

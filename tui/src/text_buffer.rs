@@ -1,6 +1,6 @@
 use collections::ArrayStr;
 
-use crate::Widget;
+use crate::{Screen, Widget};
 
 pub struct TextBuffer {
     keyboard: keyboard::Keyboard,
@@ -34,7 +34,16 @@ impl Widget for TextBuffer {
                     break;
                 }
                 screen.chars[line][column] = vga::Char::new(byte);
+                screen.cursor_pos = (line as u16, column as u16);
             }
+        }
+        screen.cursor_pos.1 += 1;
+        if Screen::WIDTH as u16 <= screen.cursor_pos.1 {
+            screen.cursor_pos.1 = 0;
+            screen.cursor_pos.0 += 1;
+        }
+        if Screen::HEIGHT as u16 <= screen.cursor_pos.0 {
+            screen.cursor_pos.0 = Screen::HEIGHT as u16  - 1;
         }
     }
 

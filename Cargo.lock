@@ -24,6 +24,7 @@ dependencies = [
  "port",
  "ps2",
  "tui",
+ "vga",
 ]
 
 [[package]]
@@ -69,3 +70,6 @@ dependencies = [
 [[package]]
 name = "vga"
 version = "0.1.0"
+dependencies = [
+ "asm",
+]
