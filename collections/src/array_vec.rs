@@ -13,13 +13,17 @@ impl<const CAPACITY: usize, T> ArrayVec<CAPACITY, T> {
         Self::default()
     }
 
+    pub unsafe fn push_unchecked(&mut self, value: T) {
+        self.values.get_unchecked_mut(self.len).write(value);
+        self.len += 1;
+    }
+
     // Maybe return a reference to the inserted value
     pub fn push(&mut self, value: T) -> Result<(), T> {
         match self.len < CAPACITY {
             false => Err(value),
             true => unsafe {
-                self.values.get_unchecked_mut(self.len).write(value);
-                self.len += 1;
+                self.push_unchecked(value);
                 Ok(())
             },
         }
@@ -57,6 +61,21 @@ impl<const CAPACITY: usize, T> ArrayVec<CAPACITY, T> {
 
     pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
         self.as_mut().iter_mut()
+    }
+
+}
+
+impl<const CAPACITY: usize, T: Clone> ArrayVec<CAPACITY, T> {
+    pub fn extend_from_slice(&mut self, slice: &[T]) -> Result<(), ()> {
+        match self.len() + slice.len() <= CAPACITY {
+            false => Err(()),
+            true => unsafe {
+                for value in slice {
+                    self.push_unchecked(value.clone());
+                }
+                Ok(())
+            },
+        }
     }
 }
 

@@ -11,6 +11,14 @@ impl<const CAPACITY: usize> ArrayStr<CAPACITY> {
     pub fn new() -> Self {
         Self::default()
     }
+
+    pub fn len(&self) -> usize {
+        self.bytes.len()
+    }
+
+    pub fn push_str(&mut self, s: &str) -> Result<(), ()> {
+        self.bytes.extend_from_slice(s.as_bytes())
+    }
 }
 
 impl<const CAPACITY: usize> AsRef<str> for ArrayStr<CAPACITY> {
@@ -33,12 +41,9 @@ impl<const CAPACITY: usize> FromStr for ArrayStr<CAPACITY> {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut bytes = ArrayVec::new();
-        match bytes.get_mut(..s.len()) {
-            None => return Err(()),
-            Some(slice) => slice.copy_from_slice(s.as_bytes()),
-        }
-        Ok(ArrayStr { bytes })
+        let mut result = Self::new();
+        result.push_str(s)?;
+        Ok(result)
     }
 }
 
