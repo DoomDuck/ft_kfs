@@ -199,7 +199,7 @@ impl Controller {
         // Flush unique byte data buffer
         self.flush();
 
-        log::debug!("Aquiring config...");
+        log::debug!("Acquiring config...");
 
         // Setup controller configuration byte
         let controller_configuration = self.configuration();
