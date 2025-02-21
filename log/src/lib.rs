@@ -1,15 +1,62 @@
 #![no_std]
 
 use core::sync::atomic::{AtomicUsize, Ordering::SeqCst};
+use collections::{ArrayRing, ArrayStr};
+use sync::SpinLock;
+
+// TODO: decide on variants and number order
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum Level {
+    Trace,
+    Debug,
+    Info,
+    Warn,
+    Error,
+}
+
+pub struct Entry {
+    pub level: Level,
+    pub content: ArrayStr<{Self::MAX_CONTENT_LENGTH}>,
+}
+
+impl Entry {
+    pub const MAX_CONTENT_LENGTH: usize = 0x100;
+}
+
+#[derive(Default)]
+pub struct Logger {
+    entries: ArrayRing<{Self::MAX_ENTRY_COUNT}, Entry>,
+}
+
+pub static INSTANCE : SpinLock<Logger> = SpinLock::new(Logger::new());
+
+impl Logger {
+    pub const MAX_ENTRY_COUNT: usize = 0x100;
+
+    pub const fn new() -> Self {
+        Self { entries: ArrayRing::new() }
+    }
+
+    pub fn register(&mut self, entry: Entry) {
+        // TODO: Maybe create a push function that does this automatical
+        if self.entries.is_full() {
+            // TODO: replace by an unwrap
+            let _ = self.entries.pop_back();
+        }
+        // TODO: replace by an unwrap
+        let _ = self.entries.push_back(entry);
+    }
+}
 
 const START_LINE: usize = 0;
 const START_COLUMN: usize = 0;
 static LINE: AtomicUsize = AtomicUsize::new(START_LINE);
 static COLUMN: AtomicUsize = AtomicUsize::new(START_COLUMN);
 
-pub struct Logger;
+pub struct VgaLogger;
 
-impl Logger {
+impl VgaLogger {
     fn write_char(&self, buffer: &mut vga::TextBuffer, to_write: u8) {
         if to_write == b'\n' {
             COLUMN.store(0, SeqCst);
@@ -34,7 +81,7 @@ impl Logger {
     }
 }
 
-impl core::fmt::Write for Logger {
+impl core::fmt::Write for VgaLogger {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         let text_buffer = unsafe { vga::TextBuffer::get_mut() };
         self.log(text_buffer, s.as_bytes());
@@ -47,7 +94,7 @@ macro_rules! log {
     ($fmt:literal $(,$args:expr)*) => {
         {
             use core::fmt::Write;
-            let _ = write!(&mut $crate::Logger, $fmt, $($args),*);
+            let _ = write!(&mut $crate::VgaLogger, $fmt, $($args),*);
         }
     };
 }

@@ -7,12 +7,20 @@ pub struct ArrayRing<const CAPACITY: usize, T> {
 }
 
 impl<const CAPACITY: usize, T> ArrayRing<CAPACITY, T> {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             values: [const { MaybeUninit::uninit() }; CAPACITY],
             len: 0,
             start: 0,
         }
+    }
+
+    pub const fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub const fn is_full(&self) -> bool {
+        self.len == CAPACITY
     }
 
     unsafe fn get_unchecked(&self, index: usize) -> &MaybeUninit<T> {
@@ -112,6 +120,12 @@ impl<const CAPACITY: usize, T> ArrayRing<CAPACITY, T> {
     // fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
     //     todo!()
     // }
+}
+
+impl<const CAPACITY: usize, T> Default for ArrayRing<CAPACITY, T> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<const CAPACITY: usize, T> Drop for ArrayRing<CAPACITY, T> {
