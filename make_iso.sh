@@ -12,7 +12,7 @@ mkdir -p $ISO_DIR/grub
 
 # Populate
 cp grub.cfg $ISO_DIR/grub/
-unlink $ISO_DIR/kfs
+rm -f $ISO_DIR/kfs
 ln ./target/i686-elf/release/kfs $ISO_DIR
 
 grub-mkrescue isofs -o kfs.iso
