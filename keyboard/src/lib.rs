@@ -7,6 +7,7 @@ mod scancode;
 
 pub use scancode::ScanCode;
 
+#[derive(Debug)]
 pub struct Event {
     pub scan_code: ScanCode,
     pub key_status: KeyStatus,

@@ -199,7 +199,7 @@ impl Controller {
         // Flush unique byte data buffer
         self.flush();
 
-        log::log!("Aquiring config...\n");
+        log::debug!("Aquiring config...");
 
         // Setup controller configuration byte
         let controller_configuration = self.configuration();
@@ -210,16 +210,16 @@ impl Controller {
             .with_bit(Configuration::FIRST_PORT_TRANSLATION_ENABLED_BIT, false);
 
 
-        log::log!("Setting config\n");
+        log::debug!("Setting config");
         self.set_configuration(new_configuration);
 
-        log::log!("Enabling second port\n");
+        log::debug!("Enabling second port");
         // Determin the number of port
         self.enable_second_port();
 
         let is_dual_channel = self.configuration().second_port_clock_is_enabled();
         if is_dual_channel {
-            log::log!("Is dual channel\n");
+            log::info!("Is dual channel");
             // Disable what has been activated
             self.disable_second_port();
 
@@ -242,16 +242,16 @@ impl Controller {
             return Err(());
         }
 
-        log::log!("Has working ports\n");
+        log::debug!("Has working ports");
 
         if first_port_is_ok {
-            log::log!("first_port_is_ok\n");
+            log::debug!("first_port_is_ok");
             self.enable_first_port();
         }
 
         // TODO: Decide what to do
         // if second_port_is_ok {
-        //     log::log!("second_port_is_ok\n");
+        //     log::log!("second_port_is_ok");
         //     self.enable_second_port();
         // }
 
@@ -267,7 +267,7 @@ impl Controller {
                 core::mem::swap(&mut response.0, &mut response.1);
             }
 
-            log::log!("response: {:x} {:x}\n", response.0, response.1);
+            log::debug!("response: {:x} {:x}", response.0, response.1);
 
             if response == (0xFA, 0xAA) {
                 first_device_type = Some(match self.try_read_n_times_no_origin(0x1000) {
@@ -299,7 +299,7 @@ impl Controller {
         //         core::mem::swap(&mut response.0, &mut response.1);
         //     }
         //
-        //     log::log!("response: {:x} {:x}\n", response.0, response.1);
+        //     log::log!("response: {:x} {:x}", response.0, response.1);
         //
         //     if response == (0xFA, 0xAA) {
         //         // second_device_type = Some(match self.read_without_origin() {

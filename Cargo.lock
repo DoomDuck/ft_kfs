@@ -23,6 +23,7 @@ dependencies = [
  "log",
  "port",
  "ps2",
+ "tui",
 ]
 
 [[package]]

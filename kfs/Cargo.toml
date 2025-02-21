@@ -8,5 +8,6 @@ authors.workspace = true
 port = { path = "../port" }
 ps2 = { path = "../ps2" }
 log = { path = "../log" }
+tui = { path = "../tui" }
 keyboard = { path = "../keyboard" }
 collections = { path = "../collections" }

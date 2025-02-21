@@ -1,4 +1,4 @@
-use core::{ops::{Deref, DerefMut}, str::FromStr};
+use core::{fmt, ops::{Deref, DerefMut}, str::FromStr};
 
 use super::ArrayVec;
 
@@ -58,5 +58,11 @@ impl<const CAPACITY: usize> Deref for ArrayStr<CAPACITY> {
 impl<const CAPACITY: usize> DerefMut for ArrayStr<CAPACITY> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.as_mut()
+    }
+}
+
+impl<const CAPACITY: usize> fmt::Write for ArrayStr<CAPACITY> {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.push_str(s).map_err(|_| fmt::Error)
     }
 }
