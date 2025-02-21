@@ -35,6 +35,7 @@ impl Color {
     }
 }
 
+#[derive(Default, Clone, Copy)]
 #[repr(C)]
 pub struct Char {
     pub code_point: u8,

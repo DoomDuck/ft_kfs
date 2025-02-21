@@ -112,14 +112,55 @@ impl<const CAPACITY: usize, T> ArrayRing<CAPACITY, T> {
     //     }
     // }
 
-    // TODO: iterator
-    // fn iter(&self) -> impl Iterator<Item = &T> {
-    //     todo!()
-    // }
-    //
-    // fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
-    //     todo!()
-    // }
+    pub fn as_slices(&self) -> (&[T], &[T]) {
+        unsafe {
+            match self.start + self.len <= CAPACITY {
+                false => {
+                    let start_slice = self.values.as_slice().get_unchecked(self.start..);
+                    let start_slice = &*(start_slice as *const [MaybeUninit<T>] as *const [T]);
+                    let end_slice = self.values.as_slice().get_unchecked(self.start..);
+                    let end_slice = &*(end_slice as *const [MaybeUninit<T>] as *const [T]);
+                    (start_slice, end_slice)
+                }
+                true => {
+                    let end = self.start + self.len;
+                    let slice = self.values.as_slice().get_unchecked(self.start..end);
+                    let slice = &*(slice as *const [MaybeUninit<T>] as *const [T]);
+                    (slice, &[])
+                }
+            }
+        }
+    }
+
+    pub fn as_slices_mut(&mut self) -> (&mut [T], &mut [T]) {
+        unsafe {
+            match self.start + self.len <= CAPACITY {
+                false => {
+                    let start_slice = self.values.as_mut_slice().get_unchecked_mut(self.start..);
+                    let start_slice = &mut *(start_slice as *mut [MaybeUninit<T>] as *mut [T]);
+                    let end_slice = self.values.as_mut_slice().get_unchecked_mut(self.start..);
+                    let end_slice = &mut *(end_slice as *mut [MaybeUninit<T>] as *mut [T]);
+                    (start_slice, end_slice)
+                }
+                true => {
+                    let end = self.start + self.len;
+                    let slice = self.values.as_mut_slice().get_unchecked_mut(self.start..end);
+                    let slice = &mut *(slice as *mut [MaybeUninit<T>] as *mut [T]);
+                    (slice, &mut [])
+                }
+            }
+        }
+    }
+
+    pub fn iter(&self) -> impl DoubleEndedIterator<Item = &T> {
+        let (start, end) = self.as_slices();
+        start.iter().chain(end)
+    }
+
+    pub fn iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut T> {
+        let (start, end) = self.as_slices_mut();
+        start.iter_mut().chain(end)
+    }
 }
 
 impl<const CAPACITY: usize, T> Default for ArrayRing<CAPACITY, T> {
