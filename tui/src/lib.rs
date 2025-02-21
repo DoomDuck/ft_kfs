@@ -11,6 +11,7 @@ pub use text_buffer::TextBuffer;
 
 pub struct Screen {
     pub chars: [[Char; Self::WIDTH]; Self::HEIGHT],
+    pub cursor_pos: (u16, u16),
 }
 
 impl Screen {
@@ -33,6 +34,8 @@ impl Screen {
     pub unsafe fn write_to_vga(&self) {
         vga::TextBuffer::get_mut()
             .copy_from_slice(&self.chars);
+
+        vga::TextBuffer::move_cursor(self.cursor_pos.1, self.cursor_pos.0);
     }
 }
 
@@ -45,6 +48,7 @@ impl Default for Screen {
                     color: Color::new(Color::WHITE, Color::BLACK),
                 }
             }; Self::WIDTH]; Self::HEIGHT],
+            cursor_pos: (0, 0),
         }
     }
 }
