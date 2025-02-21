@@ -42,6 +42,12 @@ impl Widget for Entry {
 extern "C" fn entrypoint() {
     log::info!("42");
 
+    log::trace!("TRACE");
+    log::debug!("DEBUG");
+    log::info!("INFO");
+    log::warn!("WARNING");
+    log::error!("ERROR");
+
     let mut port_manager = port::MANAGER.lock();
     let Ok(data_port) = port_manager.try_aquire() else {
         return;
