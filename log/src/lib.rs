@@ -4,6 +4,8 @@ use core::sync::atomic::{AtomicUsize, Ordering::SeqCst};
 use collections::{ArrayRing, ArrayStr};
 use sync::SpinLock;
 
+pub use collections;
+
 // TODO: decide on variants and number order
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
@@ -46,6 +48,10 @@ impl Logger {
         }
         // TODO: replace by an unwrap
         let _ = self.entries.push_back(entry);
+    }
+
+    pub fn entries(&self) -> impl DoubleEndedIterator<Item = &Entry> {
+        self.entries.iter()
     }
 }
 
@@ -91,6 +97,54 @@ impl core::fmt::Write for VgaLogger {
 
 #[macro_export]
 macro_rules! log {
+    ($level:expr, $fmt:literal $(,$args:expr)*) => {
+        {
+            use core::fmt::Write;
+            let mut content = $crate::collections::ArrayStr::new();
+            let _ = write!(&mut content, $fmt, $($args),*);
+            let entry = $crate::Entry { level: $level, content };
+            $crate::INSTANCE.lock().register(entry);
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! trace {
+    ($fmt:literal $(,$args:expr)*) => {
+        $crate::log!($crate::Level::Trace, $fmt $(,($args))*)
+    };
+}
+
+#[macro_export]
+macro_rules! debug {
+    ($fmt:literal $(,$args:expr)*) => {
+        $crate::log!($crate::Level::Debug, $fmt $(,($args))*)
+    };
+}
+
+#[macro_export]
+macro_rules! info {
+    ($fmt:literal $(,$args:expr)*) => {
+        $crate::log!($crate::Level::Info, $fmt $(,($args))*)
+    };
+}
+
+#[macro_export]
+macro_rules! warn {
+    ($fmt:literal $(,$args:expr)*) => {
+        $crate::log!($crate::Level::Warn, $fmt $(,($args))*)
+    };
+}
+
+#[macro_export]
+macro_rules! error {
+    ($fmt:literal $(,$args:expr)*) => {
+        $crate::log!($crate::Level::Error, $fmt $(,($args))*)
+    };
+}
+
+#[macro_export]
+macro_rules! vga_log {
     ($fmt:literal $(,$args:expr)*) => {
         {
             use core::fmt::Write;

@@ -6,3 +6,6 @@ authors.workspace = true
 
 [dependencies]
 vga = { path = "../vga" }
+log = { path = "../log" }
+keyboard = { path = "../keyboard" }
+collections = { path = "../collections" }

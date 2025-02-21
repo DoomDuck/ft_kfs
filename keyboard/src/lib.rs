@@ -7,15 +7,26 @@ mod scancode;
 
 pub use scancode::ScanCode;
 
+#[derive(Debug)]
 pub struct Event {
     pub scan_code: ScanCode,
     pub key_status: KeyStatus,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeyStatus {
     Pressed,
     Released,
+}
+
+impl KeyStatus {
+    pub const fn is_pressed(self) -> bool {
+        matches!(self, Self::Pressed)
+    }
+
+    pub const fn is_released(self) -> bool {
+        matches!(self, Self::Released)
+    }
 }
 
 pub struct Keyboard {

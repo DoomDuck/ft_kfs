@@ -30,11 +30,14 @@ impl Color {
     pub const YELLOW: u8 = 0xe;
     pub const WHITE: u8 = 0xf;
 
+    pub const DEFAULT: Color = Self::new(Self::WHITE, Self::BLACK);
+
     pub const fn new(front: u8, back: u8) -> Color {
         Self(back << 4 | front)
     }
 }
 
+#[derive(Default, Clone, Copy)]
 #[repr(C)]
 pub struct Char {
     pub code_point: u8,
@@ -42,9 +45,9 @@ pub struct Char {
 }
 
 impl Char {
-    pub fn new(code_point: u8) -> Self {
+    pub const fn new(code_point: u8) -> Self {
         Self {
-            color: Color::default(),
+            color: Color::DEFAULT,
             code_point,
         }
     }

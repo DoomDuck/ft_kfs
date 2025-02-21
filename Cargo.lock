@@ -23,6 +23,7 @@ dependencies = [
  "log",
  "port",
  "ps2",
+ "tui",
 ]
 
 [[package]]
@@ -59,6 +60,9 @@ version = "0.1.0"
 name = "tui"
 version = "0.1.0"
 dependencies = [
+ "collections",
+ "keyboard",
+ "log",
  "vga",
 ]
 
