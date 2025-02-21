@@ -24,5 +24,5 @@ fclean:
 docker: Dockerfile
 	docker build -t $(DOCKER_BUILDER_TAG) .
 
-run:
+run: all
 	qemu-system-i386 -cdrom kfs.iso
