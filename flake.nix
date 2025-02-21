@@ -1,5 +1,5 @@
 {
-  outputs = { nixpkgs, ... } :  let 
+  outputs = { nixpkgs, ... } :  let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
     pkgsCross = pkgs.pkgsCross.i686-embedded;
@@ -23,8 +23,8 @@
         # Rust tools
         rustup
 
-        # VM emulator
-        qemu
+        # cc
+        gcc
       ];
     };
   };
